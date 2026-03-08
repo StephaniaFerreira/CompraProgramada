@@ -40,7 +40,7 @@ namespace Aplicacao.Services
 
             _clienteRepository.AdicionarContaGrafica(conta);
             _clienteRepository.Salvar();
-            //verificar como salvar os dois juntos
+            
             
 
             return new AdesaoResponse(
