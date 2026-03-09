@@ -135,6 +135,10 @@ Os seguintes componentes são executados em containers:
 
 Responsável pela persistência dos dados da aplicação.
 
+As Migrations são aplicadas no banco quando uma das Web APIs são executadas.
+
+A conta Master é registrada no banco assim que a Web API Backoffice é executada.
+
 ### Kafka
 
 Utilizado para comunicação assíncrona entre partes do sistema.
@@ -150,6 +154,7 @@ Inicialmente a arquitetura foi planejada para possuir **Worker Services separado
 - Motor de Rebalanceamento
 
 Por isso, algumas partes da estrutura foram organizadas pensando nesse modelo.
+Mas como os workers não foram testados foi atribuido um endpoint de cotação para fazer a leitura do arquivo.
 
 Mesmo que neste momento o sistema esteja em um **monólito modular**, essa estrutura facilita no futuro:
 
@@ -161,146 +166,93 @@ Mesmo que neste momento o sistema esteja em um **monólito modular**, essa estru
 
 # Diagrama de Relacionamento das Tabelas
 
-╔══════════════════════╗
-║   ClienteCadastro    ║
-╠══════════════════════╣
-║ Id (PK)              ║
-║ Nome                 ║
-║ Cpf                  ║
-║ Email                ║
-║ ValorMensal          ║
-║ Ativo                ║
-║ DataAdesao           ║
-║ DataSaida            ║
-╚═══════════╦══════════╝
-            │ 1 : 1
-            │
-╔═══════════▼══════════╗
-║     ContaGrafica     ║
-╠══════════════════════╣
-║ Id (PK)              ║
-║ NumeroConta          ║
-║ Tipo                 ║
-║ DataCriacao          ║
-║ ClienteId (FK)       ║
-╚═══════════╦══════════╝
-            │ 1 : N
-            │
-╔═══════════▼════════════════╗
-║ ContaCustodiaFilhote       ║
-╠════════════════════════════╣
-║ Id (PK)                    ║
-║ ContaGraficaId (FK)        ║
-║ Ticker                     ║
-║ Quantidade                 ║
-║ PrecoMedio                 ║
-║ ValorAtual                 ║
-║ DataUltimaAtualizacao      ║
-╚════════════════════════════╝
 
+```text
++----------------------+          +--------------------+
+|   ClienteCadastro    | 1 : 1   |    ContaGrafica    |
++----------------------+----------+--------------------+
+| Id (PK)              |          | Id (PK)            |
+| Nome                 |          | NumeroConta        |
+| Cpf                  |          | Tipo               |
+| Email                |          | DataCriacao        |
+| ValorMensal          |          | ClienteId (FK)     |
+| Ativo                |          +--------------------+
+| DataAdesao           |                  |
+| DataSaida            |                  | 1 : N
++----------------------+                  |
+                                          v
+                               +------------------------+
+                               | ContaCustodiaFilhote   |
+                               +------------------------+
+                               | Id (PK)                |
+                               | ContaGraficaId (FK)    |
+                               | Ticker                 |
+                               | Quantidade             |
+                               | PrecoMedio             |
+                               | ValorAtual             |
+                               | DataUltimaAtualizacao  |
+                               +------------------------+
 
-╔══════════════════╗
-║   ContaMaster    ║
-╠══════════════════╣
-║ Id (PK)          ║
-║ NumeroConta      ║
-║ Tipo             ║
-╚═══════╦══════════╝
-        │ 1 : N
-        │
-╔═══════▼════════════╗
-║    ItemCustodia    ║
-╠════════════════════╣
-║ Id (PK)            ║
-║ Ticker             ║
-║ Quantidade         ║
-║ PrecoMedio         ║
-║ ValorAtual         ║
-║ Origem             ║
-║ ContaMasterId (FK) ║
-╚════════════════════╝
++--------------------+           +--------------------+
+|    ContaMaster     | 1 : N     |    ItemCustodia    |
++--------------------+-----------+--------------------+
+| Id (PK)            |           | Id (PK)            |
+| NumeroConta        |           | Ticker             |
+| Tipo               |           | Quantidade         |
++--------------------+           | PrecoMedio         |
+                                 | ValorAtual         |
+                                 | Origem             |
+                                 | ContaMasterId (FK) |
+                                 +--------------------+
 
-╔══════════════════╗
-║      Cesta       ║
-╠══════════════════╣
-║ Id (PK)          ║
-║ Nome             ║
-║ Ativa            ║
-║ DataCriacao      ║
-║ DataDesativacao  ║
-╚═══════╦══════════╝
-        │ 1 : N
-        │
-╔═══════▼════════════╗
-║     ItemCesta      ║
-╠════════════════════╣
-║ Id (PK)            ║
-║ Ticker             ║
-║ Percentual         ║
-║ CotacaoAtual       ║
-║ CestaId (FK)       ║
-╚════════════════════╝
++--------------------+           +--------------------+
+|       Cesta        | 1 : N     |      ItemCesta     |
++--------------------+-----------+--------------------+
+| Id (PK)            |           | Id (PK)            |
+| Nome               |           | Ticker             |
+| Ativa              |           | Percentual         |
+| DataCriacao        |           | CotacaoAtual       |
+| DataDesativacao    |           | CestaId (FK)       |
++--------------------+           +--------------------+
 
-╔══════════════════╗
-║     Cotacao      ║
-╠══════════════════╣
-║ Id (PK)          ║
-║ Ticker           ║
-║ DataPregao       ║
-║ PrecoFechamento  ║
-║ PrecoAbertura    ║
-║ PrecoMaximo      ║
-║ PrecoMinimo      ║
-║ TipoMercado      ║
-║ CodigoBDI        ║
-╚══════════════════╝
++--------------------+
+|      Cotacao       |
++--------------------+
+| Id (PK)            |
+| Ticker             |
+| DataPregao         |
+| PrecoFechamento    |
+| PrecoAbertura      |
+| PrecoMaximo        |
+| PrecoMinimo        |
+| TipoMercado        |
+| CodigoBDI          |
++--------------------+
 
-╔══════════════════╗
-║   OrdemCompra    ║
-╠══════════════════╣
-║ Id (PK)          ║
-║ Ticker           ║
-║ QuantidadeTotal  ║
-║ PrecoUnitario    ║
-║ ValorTotal       ║
-╚═══════╦══════════╝
-        │ 1 : N
-        │
-╔═══════▼════════════╗
-║    DetalheOrdem    ║
-╠════════════════════╣
-║ Id (PK)            ║
-║ Tipo               ║
-║ Ticker             ║
-║ Quantidade         ║
-║ OrdemCompraId (FK) ║
-╚════════════════════╝
++--------------------+           +--------------------+
+|    OrdemCompra     | 1 : N     |   DetalheOrdem     |
++--------------------+-----------+--------------------+
+| Id (PK)            |           | Id (PK)            |
+| Ticker             |           | Tipo               |
+| QuantidadeTotal    |           | Ticker             |
+| PrecoUnitario      |           | Quantidade         |
+| ValorTotal         |           | OrdemCompraId (FK) |
++--------------------+           +--------------------+
 
-╔══════════════════╗
-║  ResiduoMaster   ║
-╠══════════════════╣
-║ Id (PK)          ║
-║ Ticker           ║
-║ Quantidade       ║
-║ OrdemCompraId FK ║
-╚══════════════════╝
++--------------------+
+|  ResiduoMaster     |
++--------------------+
+| Id (PK)            |
+| Ticker             |
+| Quantidade         |
+| OrdemCompraId (FK) |
++--------------------+
 
-╔══════════════════════╗
-║ DistribuicaoCliente  ║
-╠══════════════════════╣
-║ Id (PK)              ║
-║ ClienteId            ║
-║ Nome                 ║
-║ ValorAporte          ║
-╚═════════╦════════════╝
-          │ 1 : N
-          │
-╔═════════▼════════════╗
-║   AtivoDistribuido   ║
-╠══════════════════════╣
-║ Id (PK)              ║
-║ Ticker               ║
-║ Quantidade           ║
-║ DistribuicaoClienteId║
-╚══════════════════════╝
-
++------------------------+          +------------------------+
+| DistribuicaoCliente    | 1 : N    |   AtivoDistribuido      |
++------------------------+----------+------------------------+
+| Id (PK)                |          | Id (PK)                |
+| ClienteId              |          | Ticker                 |
+| Nome                   |          | Quantidade             |
+| ValorAporte            |          | DistribuicaoClienteId  |
++------------------------+          +------------------------+
