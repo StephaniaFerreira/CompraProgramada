@@ -116,12 +116,12 @@ namespace BackOffice.Controllers
         [HttpPost("registra/cotacao")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErroResponse), StatusCodes.Status400BadRequest)]
-        public IActionResult CadastrarCotacao([FromBody] CotacaoRequest request)
+        public async Task<IActionResult> CadastrarCotacao([FromBody] CotacaoRequest request)
         {
             try
             {
 
-                _cotacaoService.ExecutarRegistroArquivo(request.Data);
+                await _cotacaoService.ExecutarRegistroArquivo(request.Data);
 
                 var response = new
                 {

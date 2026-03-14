@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Core.Entities
 {
     
-    public class OrdemCompra
+    public class Ordem
     {
         [Key]
         public int Id { get; set; }
@@ -12,6 +12,8 @@ namespace Core.Entities
         public int QuantidadeTotal { get; set; }
         public decimal PrecoUnitario { get; set; }
         public decimal ValorTotal { get; set; }
+        public string TipoOrdem { get; set; } = null!;
+        public DateTime DataCompra { get; set; }
 
 
         public virtual List<DetalheOrdem> Detalhes { get; set; } = new List<DetalheOrdem>();
@@ -25,9 +27,9 @@ namespace Core.Entities
         public string Ticker { get; set; } = null!;
         public int Quantidade { get; set; }
 
-        public int OrdemCompraId { get; set; }
-        [ForeignKey("OrdemCompraId")]
-        public virtual OrdemCompra OrdemCompra { get; set; } = null!;
+        public int OrdemId { get; set; }
+        [ForeignKey("OrdemId")]
+        public virtual Ordem Ordem { get; set; } = null!;
     }
 
     public class ResiduoMaster
@@ -37,9 +39,9 @@ namespace Core.Entities
         public string Ticker { get; set; } = null!;
         public int Quantidade { get; set; }
 
-        public int? OrdemCompraId { get; set; }
-        [ForeignKey("OrdemCompraId")]
-        public virtual OrdemCompra? OrdemOrigem { get; set; }
+        public int? OrdemId { get; set; }
+        [ForeignKey("OrdemId")]
+        public virtual Ordem? OrdemOrigem { get; set; }
     }
 
     public class DistribuicaoCliente

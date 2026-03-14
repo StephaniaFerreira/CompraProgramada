@@ -1,74 +1,36 @@
 ﻿using Aplicacao.Interfaces;
 using Core.Entities;
-using Core.Interfaces;
-using FileHelpers;
-using Aplicacao.Models.Arquivo;
+using Core.Interfaces.Cotacoes;
 
 namespace Aplicacao.Services
 {
     public class CotacaoService: ICotacaoService
     {
-        private readonly IDbContext _context;
-        public CotacaoService(IDbContext context)
+        private readonly ICotacaoRepository _cotacaoRepository;
+        private readonly ICotacaoArquivoReader _reader;
+
+        public CotacaoService(ICotacaoRepository cotacaoRepository, ICotacaoArquivoReader reader)
         {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _cotacaoRepository = cotacaoRepository ?? throw new ArgumentNullException(nameof(cotacaoRepository));
+            _reader = reader ?? throw new ArgumentNullException(nameof(reader));
         }
-        public void ExecutarRegistroArquivo(DateTime data)
+        public async Task ExecutarRegistroArquivo(DateTime data)
         {
-            List<Cotacao> cotacoes = LerArquivo(data);
+            List<Cotacao> cotacoes = await _reader.LerAsync(data);
 
-            if(!ExisteRegistroParaData(data))
-                PopularTabela(cotacoes);
-        }
+            var ticketsVigente = _cotacaoRepository.ObterTicketsCestaAtual();
 
-        private static List<Cotacao> LerArquivo(DateTime data)
-        {
-            var rootPath = Path.GetFullPath(
-                                            Path.Combine(Directory.GetCurrentDirectory(), @"..\..")
-                                            );
+            var cotacoesVigentes = cotacoes
+                                    .Where(c => ticketsVigente.Contains(c.Ticker))
+                                    .ToList();
 
-            var fileName = $"COTAHIST_D{data:ddMMyyyy}.txt";
-
-            var path = Path.Combine(rootPath, "cotacoes", fileName);
-
-            var engine = new FileHelperAsyncEngine<CotahistRegistro>();
-            var cotacoes = new List<Cotacao>();
-
-            using (engine.BeginReadFile(path))
-            {
-                CotahistRegistro registro;
-
-                while ((registro = engine.ReadNext()) != null)
-                {
-                    if (registro.TIPREG != "01")
-                        continue;
-
-                    Cotacao cotacao = new();
-                    cotacao.Ticker = registro.CODNEG;
-                    cotacao.DataPregao = registro.DATPRE;
-                    cotacao.PrecoFechamento = registro.PREULT;
-                    cotacao.PrecoAbertura = registro.PREABE;
-                    cotacao.PrecoMaximo = registro.PREMAX;
-                    cotacao.PrecoMinimo = registro.PREMIN;
-                    cotacao.TipoMercado = int.Parse(registro.TPMERC);
-                    cotacao.CodigoBDI = registro.CODBDI;
-                    cotacao.DataRegistro = data.Date;
-
-                    cotacoes.Add(cotacao);
-                }
-            }
-
-            return cotacoes;
-        }
-        private void PopularTabela(List<Cotacao> cotacoes)
-        {
-            _context.Cotacoes.AddRange(cotacoes);
-            _context.SaveChanges();
+            if (!_cotacaoRepository.ExisteRegistroParaData(data))
+                _cotacaoRepository.PopularTabela(cotacoesVigentes);
 
         }
-        private bool ExisteRegistroParaData(DateTime data)
-        {
-            return _context.Cotacoes.Any(c => c.DataRegistro == data.Date);
-        }
+
+        
+        
+        
     }
 }

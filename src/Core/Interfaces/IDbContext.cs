@@ -11,7 +11,7 @@ namespace Core.Interfaces
         DbSet<ItemCesta> ItensCesta { get; set; }
         DbSet<ContaMaster> ContaMaster { get; set; }
         DbSet<CustodiaMaster> CustodiaMaster { get; set; }
-        DbSet<OrdemCompra> OrdensCompra { get; set; }
+        DbSet<Ordem> Ordens { get; set; }
         DbSet<CustodiaFilhote> CustodiasFilhotes { get; set; }
         DbSet<Cotacao> Cotacoes { get; set; }
         DbSet<ArquivoLido> ArquivosLidos { get; set; }

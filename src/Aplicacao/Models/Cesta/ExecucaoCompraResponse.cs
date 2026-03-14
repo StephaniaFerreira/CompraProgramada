@@ -8,7 +8,7 @@ namespace Aplicacao.Models.Cesta
         public int TotalClientes { get; set; } 
         public decimal TotalConsolidado { get; set; } 
 
-        public List<OrdemCompra> OrdensCompra { get; set; } = new List<OrdemCompra>();
+        public List<Ordem> Ordens { get; set; } = new List<Ordem>();
 
         
         public List<DistribuicaoCliente> Distribuicoes { get; set; } = new List<DistribuicaoCliente>();

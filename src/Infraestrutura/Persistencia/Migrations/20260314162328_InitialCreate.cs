@@ -130,7 +130,7 @@ namespace Infraestrutura.Persistencia.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "OrdensCompra",
+                name: "Ordens",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -139,11 +139,14 @@ namespace Infraestrutura.Persistencia.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     QuantidadeTotal = table.Column<int>(type: "int", nullable: false),
                     PrecoUnitario = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    ValorTotal = table.Column<decimal>(type: "decimal(65,30)", nullable: false)
+                    ValorTotal = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
+                    TipoOrdem = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DataCompra = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrdensCompra", x => x.Id);
+                    table.PrimaryKey("PK_Ordens", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -257,15 +260,15 @@ namespace Infraestrutura.Persistencia.Migrations
                     Ticker = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Quantidade = table.Column<int>(type: "int", nullable: false),
-                    OrdemCompraId = table.Column<int>(type: "int", nullable: false)
+                    OrdemId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DetalheOrdem", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DetalheOrdem_OrdensCompra_OrdemCompraId",
-                        column: x => x.OrdemCompraId,
-                        principalTable: "OrdensCompra",
+                        name: "FK_DetalheOrdem_Ordens_OrdemId",
+                        column: x => x.OrdemId,
+                        principalTable: "Ordens",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -325,9 +328,9 @@ namespace Infraestrutura.Persistencia.Migrations
                 column: "ContaGraficaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DetalheOrdem_OrdemCompraId",
+                name: "IX_DetalheOrdem_OrdemId",
                 table: "DetalheOrdem",
-                column: "OrdemCompraId");
+                column: "OrdemId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ItensCesta_CestaId",
@@ -368,7 +371,7 @@ namespace Infraestrutura.Persistencia.Migrations
                 name: "ContasGraficas");
 
             migrationBuilder.DropTable(
-                name: "OrdensCompra");
+                name: "Ordens");
 
             migrationBuilder.DropTable(
                 name: "Cestas");

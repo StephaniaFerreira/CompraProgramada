@@ -38,6 +38,7 @@ namespace Core.Repositories
         {
             return contaMaster!.ItensCustodia!.FirstOrDefault(i => i.Ticker == ticket.Ticker);
         }
+
         public CustodiaFilhote ObterCustodiaFilhote(ItemCesta ticket, ClienteCadastro cliente)
         {
             var custodiaAnterior = _context.CustodiasFilhotes
@@ -61,13 +62,17 @@ namespace Core.Repositories
                 ((DbContext)_context).Entry(custodia).State = EntityState.Modified;
             }
         }
+        public void AdicionarCustodiaMaster(List<CustodiaMaster> custodias)
+        {
+            _context.CustodiaMaster.AddRange(custodias);
+        }
         public int ObterQuantidadeRemanecenteCustodia(ContaMaster contaMaster, ItemCesta ticket)
         {
             return contaMaster!.ItensCustodia.Where(i => i.Ticker == ticket.Ticker && i.Quantidade > 0).Select(i => i.Quantidade).FirstOrDefault();
         }
-        public void AdicionarOrdensCompraMaster(List<OrdemCompra> ordens)
+        public void AdicionarOrdensMaster(List<Ordem> ordens)
         {
-            _context.OrdensCompra.AddRange(ordens);
+            _context.Ordens.AddRange(ordens);
         }
         public Cesta ObterCestaVigente()
         {

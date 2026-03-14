@@ -41,8 +41,6 @@ namespace Core.MotorCompra
 
             var contaMaster = _motorCompraCompraRepository.ObterContaMaster();
 
-          
-
 
             Dictionary<string, int> quantidadeAcaoAComprarPorTicket = new();
 
@@ -61,9 +59,13 @@ namespace Core.MotorCompra
                 
                 int quantidadeFracionaria = _motorCompraDomainService.CalcularQuantidadeLotesFracionario(quantidadeAcaoAComprarPorTicket, ticket);
 
-                var ordensCompra = _motorCompraDomainService.CriarOrdemCompraMaster(quantidadeLotesPadrao, quantidadeFracionaria, cotacoes, ticket);
+                var ordens = _motorCompraDomainService.CriarOrdemCompraMaster(quantidadeLotesPadrao, quantidadeFracionaria, cotacoes, ticket);
 
-                _motorCompraCompraRepository.AdicionarOrdensCompraMaster(ordensCompra);
+                _motorCompraCompraRepository.AdicionarOrdensMaster(ordens);
+
+                var custodiasMaster = _motorCompraDomainService.CriarCustodiaMaster(ordens, contaMaster);
+
+                _motorCompraCompraRepository.AdicionarCustodiaMaster(custodiasMaster);
 
                 CustodiaFilhote contaCustodiaFilhote = new();
                 int totalDistribuido = 0;
@@ -72,7 +74,7 @@ namespace Core.MotorCompra
                 {
                     var valorAporteIndividual = _motorCompraDomainService.CalcularValorAporteIndividual(cliente);
                     var porcentagemAporteCliente = _motorCompraDomainService.CalcularPorcentagemAporteIndividual(valorAporteIndividual, valorAporteTotal);
-                                        
+
                     int quantidadeNova = _motorCompraDomainService.CalcularQuantidadeNovaAtivo(quantidadeAcaoAComprarPorTicket, ticket, porcentagemAporteCliente);
                     totalDistribuido += quantidadeNova;
 
@@ -85,14 +87,14 @@ namespace Core.MotorCompra
                     var custodia = _motorCompraDomainService.CriarOuAlterarCustodiaFilhote(custodiaAnterior, contaGraficaId, ticket, quantidadeNova, novoPrecoMedio, cotacoes);
 
                     _motorCompraCompraRepository.AdicionarCustodiaFilhote(custodia);
-                    
+
                 }
 
-                var residuoAnterior = _motorCompraCompraRepository.ObterResiduoMaster(contaMaster, ticket);
+                //var residuoAnterior = _motorCompraCompraRepository.ObterResiduoMaster(contaMaster, ticket);
 
-                var residuo = _motorCompraDomainService.AlterarResiduos(totalDistribuido, ticket, quantidadeAtivo, contaMaster, data, residuoAnterior!);
+                //var residuo = _motorCompraDomainService.AlterarResiduos(totalDistribuido, ticket, quantidadeAtivo, contaMaster, data, residuoAnterior!);
 
-                _motorCompraCompraRepository.AdicionarResiduos(residuo);
+                //_motorCompraCompraRepository.AdicionarResiduos(residuo);
             }
 
             _motorCompraCompraRepository.Salvar();

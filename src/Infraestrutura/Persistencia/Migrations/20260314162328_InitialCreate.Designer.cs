@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infraestrutura.Persistencia.Migrations
 {
     [DbContext(typeof(MySQLDbContext))]
-    [Migration("20260307212003_InitialCreate")]
+    [Migration("20260314162328_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -281,7 +281,7 @@ namespace Infraestrutura.Persistencia.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("OrdemCompraId")
+                    b.Property<int>("OrdemId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantidade")
@@ -297,7 +297,7 @@ namespace Infraestrutura.Persistencia.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrdemCompraId");
+                    b.HasIndex("OrdemId");
 
                     b.ToTable("DetalheOrdem");
                 });
@@ -352,11 +352,14 @@ namespace Infraestrutura.Persistencia.Migrations
                     b.ToTable("ItensCesta");
                 });
 
-            modelBuilder.Entity("Core.Entities.OrdemCompra", b =>
+            modelBuilder.Entity("Core.Entities.Ordem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("DataCompra")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<decimal>("PrecoUnitario")
                         .HasColumnType("decimal(65,30)");
@@ -368,12 +371,16 @@ namespace Infraestrutura.Persistencia.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("TipoOrdem")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<decimal>("ValorTotal")
                         .HasColumnType("decimal(65,30)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("OrdensCompra");
+                    b.ToTable("Ordens");
                 });
 
             modelBuilder.Entity("Core.Entities.AtivoDistribuido", b =>
@@ -422,13 +429,13 @@ namespace Infraestrutura.Persistencia.Migrations
 
             modelBuilder.Entity("Core.Entities.DetalheOrdem", b =>
                 {
-                    b.HasOne("Core.Entities.OrdemCompra", "OrdemCompra")
+                    b.HasOne("Core.Entities.Ordem", "Ordem")
                         .WithMany("Detalhes")
-                        .HasForeignKey("OrdemCompraId")
+                        .HasForeignKey("OrdemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("OrdemCompra");
+                    b.Navigation("Ordem");
                 });
 
             modelBuilder.Entity("Core.Entities.ItemCesta", b =>
@@ -463,7 +470,7 @@ namespace Infraestrutura.Persistencia.Migrations
                     b.Navigation("Ativos");
                 });
 
-            modelBuilder.Entity("Core.Entities.OrdemCompra", b =>
+            modelBuilder.Entity("Core.Entities.Ordem", b =>
                 {
                     b.Navigation("Detalhes");
                 });

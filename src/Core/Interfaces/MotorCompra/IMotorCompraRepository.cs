@@ -15,11 +15,12 @@ namespace Core.Interfaces.MotorCompra
         Dictionary<string, decimal> ObterCotacaoPorTicket(List<ItemCesta> item, DateTime data);
         int ObterQuantidadeRemanecenteCustodia(ContaMaster conta, ItemCesta item);
         int ObterContaGraficaId(ItemCesta item, ClienteCadastro cliente);
-        void AdicionarOrdensCompraMaster(List<OrdemCompra> ordens);
+        void AdicionarOrdensMaster(List<Ordem> ordens);
         void AdicionarCustodiaFilhote(CustodiaFilhote custodia);
         CustodiaFilhote ObterCustodiaFilhote(ItemCesta ticket, ClienteCadastro cliente);
         CustodiaMaster? ObterResiduoMaster(ContaMaster contaMaster, ItemCesta ticket);
         void Salvar();
         void AdicionarResiduos(CustodiaMaster residuo);
+        void AdicionarCustodiaMaster(List<CustodiaMaster> custodia);
     }
 }

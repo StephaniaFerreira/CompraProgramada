@@ -351,7 +351,7 @@ namespace BackofficeUnitTests
 
             //// Assert
             //// Verificamos se o repositório foi chamado para salvar as ordens e custódias
-            //mockRepository.Verify(r => r.SalvarOrdens(It.Is<List<OrdemCompra>>(l => l.Count > 0)), Times.Once);
+            //mockRepository.Verify(r => r.SalvarOrdens(It.Is<List<Ordem>>(l => l.Count > 0)), Times.Once);
 
             //impostoMock.Verify(
             //    x => x.CalcularIRDedoDuro(It.IsAny<DateTime>()),

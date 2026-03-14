@@ -11,6 +11,8 @@ using Core.Interfaces.Backoffice;
 using Core.Service;
 using Core.Repositories;
 using Core.Interfaces.MotorCompra;
+using Core.Interfaces.Cotacoes;
+using Infraestrutura.Arquivo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,6 +50,9 @@ builder.Services.AddScoped<IBackofficeDomainService, BackofficeDomainService>();
 builder.Services.AddScoped<IBackofficeService, BackofficeService>();
 builder.Services.AddScoped<IMotorCompraDomainService, MotorCompraDomainService>();
 builder.Services.AddScoped<IMotorCompraRepository, MotorCompraRepository>();
+builder.Services.AddScoped<ICotacaoRepository, CotacaoRepository>();
+builder.Services.AddScoped<ICotacaoArquivoReader, CotacaoArquivoReader>();
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

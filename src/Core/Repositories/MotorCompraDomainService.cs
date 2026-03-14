@@ -9,7 +9,7 @@ namespace Core.Repositories
 
         public decimal CalcularValorTotalAtivo(ItemCesta ticket, decimal valorAporteTotal)
         {
-            return ticket.Percentual * valorAporteTotal;
+            return (ticket.Percentual/100) * valorAporteTotal;
         }
         public int CalcularQuantidadeAtivo(decimal valorTotalAtivo, Dictionary<string, decimal> cotacoes, ItemCesta ticket)
         {
@@ -40,33 +40,57 @@ namespace Core.Repositories
             return (int)Math.Truncate(quantidadeAcaoAComprarPorTicket[ticket.Ticker] * porcentagemAporteCliente);
         }
         
-        public List<OrdemCompra> CriarOrdemCompraMaster(int quantidadeLotesPadrao, int quantidadeFracionaria, Dictionary<string, decimal> cotacoes, ItemCesta ticket)
+        public List<Ordem> CriarOrdemCompraMaster(int quantidadeLotesPadrao, int quantidadeFracionaria, Dictionary<string, decimal> cotacoes, ItemCesta ticket)
         {
-            List<OrdemCompra> ordensCompra = new();
+            List<Ordem> Ordens = new();
             if (quantidadeLotesPadrao > 0)
             {
-                OrdemCompra ordemPadrao = new();
+                Ordem ordemPadrao = new();
                 ordemPadrao.Ticker = $"{ticket.Ticker}";
                 ordemPadrao.QuantidadeTotal = quantidadeLotesPadrao;
                 ordemPadrao.ValorTotal = quantidadeLotesPadrao * cotacoes[ticket.Ticker];
                 ordemPadrao.PrecoUnitario = cotacoes[ticket.Ticker];
                 ordemPadrao.Detalhes.Add(new DetalheOrdem { Ticker = $"{ticket.Ticker}", Quantidade = quantidadeLotesPadrao, Tipo = "PADRAO" });
+                ordemPadrao.TipoOrdem = "Compra";
+                ordemPadrao.DataCompra = DateTime.Now.Date;
 
-                ordensCompra.Add(ordemPadrao);
+                Ordens.Add(ordemPadrao);
             }
             if (quantidadeFracionaria > 0)
             {
-                OrdemCompra ordemFracionaria = new();
+                Ordem ordemFracionaria = new();
                 ordemFracionaria.Ticker = $"{ticket.Ticker}";
                 ordemFracionaria.QuantidadeTotal = quantidadeFracionaria;
                 ordemFracionaria.PrecoUnitario = cotacoes[ticket.Ticker];
                 ordemFracionaria.ValorTotal = ordemFracionaria.QuantidadeTotal * ordemFracionaria.PrecoUnitario;
                 ordemFracionaria.Detalhes.Add(new DetalheOrdem { Ticker = $"{ticket.Ticker}F", Quantidade = quantidadeFracionaria, Tipo = "FRACIONARIO" });
+                ordemFracionaria.TipoOrdem = "Compra";
+                ordemFracionaria.DataCompra = DateTime.Now.Date;
 
-                ordensCompra.Add(ordemFracionaria);
+                Ordens.Add(ordemFracionaria);
 
             }
-            return ordensCompra;
+            return Ordens;
+        }
+        public List<CustodiaMaster> CriarCustodiaMaster(List<Ordem> ordens, ContaMaster contaMaster)
+        {
+            List<CustodiaMaster> custodias = new();
+            foreach (var ordem in ordens)
+            {
+                var custodia = new CustodiaMaster
+                {
+                    Quantidade = ordem.QuantidadeTotal,
+                    Ticker = ordem.Ticker,
+                    PrecoMedio = 0,
+                    ValorAtual = ordem.PrecoUnitario,
+                    Origem = $"Compra {ordem.DataCompra}",
+                    ContaMasterId = contaMaster.Id
+                };
+                custodias.Add(custodia);
+            }
+                
+
+            return custodias;
         }
         public decimal CalcularNovoPrecoMedio(CustodiaFilhote custodiaAnterior, int quantidadeNova, Dictionary<string, decimal> cotacoes, ItemCesta ticket)
         {

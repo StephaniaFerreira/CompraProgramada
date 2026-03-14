@@ -4,7 +4,6 @@ using Aplicacao.Models.Cliente.Adesao;
 using Aplicacao.Models.Cliente.AlterarValorMensal;
 using Aplicacao.Models.Cliente.Carteira;
 using Cliente.Models.Saida;
-using Core.Exceptions;
 using Core.Expections;
 using Microsoft.AspNetCore.Mvc;
 

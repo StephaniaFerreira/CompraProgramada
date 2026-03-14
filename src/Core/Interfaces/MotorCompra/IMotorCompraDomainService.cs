@@ -20,6 +20,7 @@ namespace Core.Interfaces.MotorCompra
         decimal CalcularPorcentagemAporteIndividual(decimal valorAporteIndividual, decimal valorAporteTotal);
         CustodiaFilhote CriarOuAlterarCustodiaFilhote(CustodiaFilhote custodiaAnterior, int contaGraficaId, ItemCesta ticket, int quantidadeNova, decimal novoPrecoMedio, Dictionary<string, decimal> cotacoes);
         CustodiaMaster AlterarResiduos(int totalDistribuido, ItemCesta ticket, int quantidadeAtivo, ContaMaster contaMaster, DateTime data, CustodiaMaster residuoAnterior);
-        List<OrdemCompra> CriarOrdemCompraMaster(int quantidadeLotesPadrao, int quantidadeFracionaria, Dictionary<string, decimal> cotacoes, ItemCesta ticket);
+        List<Ordem> CriarOrdemCompraMaster(int quantidadeLotesPadrao, int quantidadeFracionaria, Dictionary<string, decimal> cotacoes, ItemCesta ticket);
+        List<CustodiaMaster> CriarCustodiaMaster(List<Ordem> ordens, ContaMaster contaMaster);
     }
 }

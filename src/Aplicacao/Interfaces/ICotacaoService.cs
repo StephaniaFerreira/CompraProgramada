@@ -2,7 +2,7 @@
 {
     public interface ICotacaoService
     {
-        void ExecutarRegistroArquivo(DateTime data);
+        Task ExecutarRegistroArquivo(DateTime data);
     }
 }
 

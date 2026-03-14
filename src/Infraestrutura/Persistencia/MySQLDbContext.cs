@@ -20,7 +20,7 @@ namespace Infraestrutura.Persistencia
         public DbSet<ContaMaster> ContaMaster { get; set; } = null!;
         public DbSet<CustodiaMaster> CustodiaMaster { get; set; } = null!;
 
-        public DbSet<OrdemCompra> OrdensCompra { get; set; } = null!;
+        public DbSet<Ordem> Ordens { get; set; } = null!;
 
         public DbSet<CustodiaFilhote> CustodiasFilhotes { get; set; } = null!;
         public DbSet<Cotacao> Cotacoes { get; set; } = null!;
