@@ -59,7 +59,7 @@ namespace ClienteUnitTests
             var mockClienteDomainService = new Mock<IClienteDomainService>();
             var mockClienteRepository = new Mock<IClienteRepository>();
 
-            mockClienteRepository.Setup(c => c.ExisteCpf("456")).Returns(false);
+            mockClienteRepository.Setup(c => c.ExisteCpf(It.IsAny<string>())).Returns(false);
 
             var service = new ClienteService(mockClienteDomainService.Object, mockClienteRepository.Object);
 

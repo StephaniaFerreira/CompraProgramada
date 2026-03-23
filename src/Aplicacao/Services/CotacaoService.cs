@@ -18,10 +18,10 @@ namespace Aplicacao.Services
         {
             List<Cotacao> cotacoes = await _reader.LerAsync(data);
 
-            var ticketsVigente = _cotacaoRepository.ObterTicketsCestaAtual();
+            var TickersVigente = _cotacaoRepository.ObterTickersCestaAtual();
 
             var cotacoesVigentes = cotacoes
-                                    .Where(c => ticketsVigente.Contains(c.Ticker))
+                                    .Where(c => TickersVigente.Contains(c.Ticker))
                                     .ToList();
 
             if (!_cotacaoRepository.ExisteRegistroParaData(data))

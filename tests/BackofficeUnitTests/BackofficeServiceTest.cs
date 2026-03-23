@@ -177,7 +177,7 @@ namespace BackofficeUnitTests
                         { "ABEV3", 14.50m },
                         { "RENT3", 49.00m }
                     };
-            mockClienteRepository.Setup(s => s.ObterCotacaoPorTicket(cestaAtiva.Itens)).Returns(cotacoesFake);
+            mockClienteRepository.Setup(s => s.ObterCotacaoPorTicker(cestaAtiva.Itens)).Returns(cotacoesFake);
 
             // Act
             var response = service.ConsultarAtual();
@@ -288,7 +288,7 @@ namespace BackofficeUnitTests
                 { "ITUB4", 31.00m },
                 { "WEGE3", 42.00m }
             };
-            mockClienteRepository.Setup(s => s.ObterCotacaoPorTicket(new List<ItemCesta>())).Returns(cotacoesAtuais);
+            mockClienteRepository.Setup(s => s.ObterCotacaoPorTicker(new List<ItemCesta>())).Returns(cotacoesAtuais);
 
             // Act
             var response = service.ConsultarCustodiaMaster();

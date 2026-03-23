@@ -8,11 +8,14 @@ namespace Core.Interfaces.Backoffice
         List<Cesta> ObterCestas();
         int ObterTotalClientesAtivos();
         ContaMaster ObterContaMaster();
+        List<CustodiaFilhote> ObterCustodiaFilhotes(DateTime data);
         List<CustodiaMaster> ObterCustodiaMaster();
         void AdicionarCesta(Cesta cesta);
         void Salvar();
-        Dictionary<string, decimal> ObterCotacaoPorTicket(List<ItemCesta> item);
+        Dictionary<string, decimal> ObterCotacaoPorTicker(List<ItemCesta> item);
+        List<Ordem> ObterOrdens(DateTime data);
 
+        List<ClienteCadastro> ObterClientesAtivos();
 
     }
 }

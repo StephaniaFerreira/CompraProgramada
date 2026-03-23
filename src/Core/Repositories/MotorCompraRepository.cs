@@ -34,20 +34,20 @@ namespace Core.Repositories
                 ((DbContext)_context).Entry(residuo).State = EntityState.Modified;
             }
         }
-        public CustodiaMaster? ObterResiduoMaster(ContaMaster contaMaster, ItemCesta ticket)
+        public CustodiaMaster? ObterResiduoMaster(ContaMaster contaMaster, ItemCesta Ticker)
         {
-            return contaMaster!.ItensCustodia!.FirstOrDefault(i => i.Ticker == ticket.Ticker);
+            return contaMaster!.ItensCustodia!.FirstOrDefault(i => i.Ticker == Ticker.Ticker);
         }
 
-        public CustodiaFilhote ObterCustodiaFilhote(ItemCesta ticket, ClienteCadastro cliente)
+        public CustodiaFilhote ObterCustodiaFilhote(ItemCesta Ticker, ClienteCadastro cliente)
         {
             var custodiaAnterior = _context.CustodiasFilhotes
                                                 .FirstOrDefault(c =>
-                                                                c.Ticker == ticket.Ticker &&
+                                                                c.Ticker == Ticker.Ticker &&
                                                                 c.ContaGrafica!.Cliente!.Id == cliente.Id);
             return custodiaAnterior!;
         }
-        public int ObterContaGraficaId(ItemCesta ticket, ClienteCadastro cliente)
+        public int ObterContaGraficaId(ItemCesta Ticker, ClienteCadastro cliente)
         {
             return _context.ContasGraficas.Where(i => i.ClienteId == cliente.Id).Select(c => c.Id).FirstOrDefault();
         }
@@ -66,9 +66,9 @@ namespace Core.Repositories
         {
             _context.CustodiaMaster.AddRange(custodias);
         }
-        public int ObterQuantidadeRemanecenteCustodia(ContaMaster contaMaster, ItemCesta ticket)
+        public int ObterQuantidadeRemanecenteCustodia(ContaMaster contaMaster, ItemCesta Ticker)
         {
-            return contaMaster!.ItensCustodia.Where(i => i.Ticker == ticket.Ticker && i.Quantidade > 0).Select(i => i.Quantidade).FirstOrDefault();
+            return contaMaster!.ItensCustodia.Where(i => i.Ticker == Ticker.Ticker && i.Quantidade > 0).Select(i => i.Quantidade).FirstOrDefault();
         }
         public void AdicionarOrdensMaster(List<Ordem> ordens)
         {
@@ -89,13 +89,13 @@ namespace Core.Repositories
                                 .FirstOrDefault(c => c.Tipo == "MASTER");
             return contaMaster!;
         }
-        public Dictionary<string, decimal> ObterCotacaoPorTicket(List<ItemCesta> item, DateTime data)
+        public Dictionary<string, decimal> ObterCotacaoPorTicker(List<ItemCesta> item, DateTime data)
         {
-            var tickersInteresse = item.Select(i => i.Ticker).ToList();
+            var TickersInteresse = item.Select(i => i.Ticker).ToList();
 
 
             return _context.Cotacoes
-                .Where(c => tickersInteresse.Contains(c.Ticker) && c.DataRegistro.Date == data.Date)
+                .Where(c => TickersInteresse.Contains(c.Ticker) && c.DataRegistro.Date == data.Date)
                 .ToDictionary(
                     c => c.Ticker,
                     c => c.PrecoFechamento

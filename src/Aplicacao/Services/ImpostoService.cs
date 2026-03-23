@@ -15,8 +15,9 @@ namespace Aplicacao.Interfaces
             _kafka = kafka;
         }
 
-        public async Task CalcularIRDedoDuro(DateTime dataReferencia)
+        public async Task<int> CalcularIRDedoDuro(DateTime dataReferencia)
         {
+            int quantidadeMsg = 0;
             var clientes = _context.Clientes
                 .Where(c => c.Ativo)
                 .ToList();
@@ -41,11 +42,14 @@ namespace Aplicacao.Interfaces
 
                     var imposto = CalcularAliquota(valorTotal);
 
-                    await RegistrarImposto(cliente.Id, cliente.Cpf, valorTotal, imposto, dataReferencia);
+                    await RegistrarImposto(cliente.Id, cliente.Cpf, ativo.Ticker, valorTotal, imposto, dataReferencia);
+
+                    quantidadeMsg++;
 
                 }
 
             }
+            return quantidadeMsg;
         }
 
         private static decimal CalcularAliquota(decimal valorTotal)
@@ -56,12 +60,13 @@ namespace Aplicacao.Interfaces
             return valorTotal * 0.00005m; // 0,005%
         }
 
-        private async Task RegistrarImposto(int clienteId,string CPF,decimal valorOperacao, decimal valorImposto, DateTime data)
+        private async Task RegistrarImposto(int clienteId,string CPF,string Ticker, decimal valorOperacao, decimal valorImposto, DateTime data)
         {
             var evento = new IRDedoDuroCalculado
             {
                 ClienteId = clienteId,
                 CPF = CPF,
+                Ticker = Ticker,
                 ValorOperacao = valorOperacao,
                 ValorImposto = valorImposto,
                 Data = data

@@ -1,9 +1,5 @@
 ﻿using Core.Expections;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BrazilHolidays.Net;
 
 namespace Aplicacao.Validacoes
 {
@@ -16,6 +12,41 @@ namespace Aplicacao.Validacoes
                     $"Insera as cotacoes.",
                     "NAO_HA_COTACAO"
                 );
+        }
+        public static DateTime ObterProximoDiaUtil(DateTime data)
+        {
+            while (EhFimDeSemana(data) || EhFeriado(data))
+            {
+                data = data.AddDays(1);
+            }
+            return data;
+        }
+        private static bool EhFimDeSemana(DateTime data)
+        {
+            return data.DayOfWeek == DayOfWeek.Saturday || data.DayOfWeek == DayOfWeek.Sunday;
+        }
+        private static bool EhFeriado(DateTime data)
+        {
+            return data.IsHoliday();
+        }
+
+        public static void EhDataDeExecucaoValida(DateTime data)
+        {
+            int[] diasAlvo = { 5, 15, 25 };
+
+            foreach (var dia in diasAlvo)
+            {
+                DateTime dataTeorica = new DateTime(data.Year, data.Month, dia);
+
+                DateTime dataExecucaoEsperada = ObterProximoDiaUtil(dataTeorica);
+
+                if (data.Date != dataExecucaoEsperada.Date)
+                {
+                    throw new InvalidOperationException($"A data {data:dd/MM/yyyy} não é um dia de execução válido (5, 15 ou 25).");
+                }
+
+                break;
+            }
         }
     }
 }

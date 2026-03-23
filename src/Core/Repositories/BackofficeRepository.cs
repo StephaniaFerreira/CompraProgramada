@@ -36,9 +36,17 @@ namespace Core.Repositories
         {
             return _context.ContaMaster!.FirstOrDefault()!;
         }
+        public List<Ordem> ObterOrdens(DateTime data)
+        {
+            return _context.Ordens.Where(o => o.DataCompra.Date == data.Date).ToList();
+        }
         public List<CustodiaMaster> ObterCustodiaMaster()
         {
             return _context.CustodiaMaster!.Where(i => i.Quantidade != 0).ToList();
+        }
+        public List<CustodiaFilhote> ObterCustodiaFilhotes(DateTime data)
+        {
+            return _context.CustodiasFilhotes.Where(c => c.DataUltimaAtualizacao.Date == data.Date).ToList();
         }
         public void AdicionarCesta(Cesta cesta)
         {
@@ -52,8 +60,14 @@ namespace Core.Repositories
         {
             return _context.Clientes.Count(c => c.Ativo);
         }
+        public List<ClienteCadastro> ObterClientesAtivos()
+        {
+            return _context.Clientes
+                           .Include(c => c.ContaGrafica)
+                           .Where(c => c.Ativo).ToList();
+        }
 
-        public Dictionary<string,decimal> ObterCotacaoPorTicket(List<ItemCesta> item)
+        public Dictionary<string,decimal> ObterCotacaoPorTicker(List<ItemCesta> item)
         {
             var tickersInteresse = item.Select(i => i.Ticker).ToList();
 

@@ -30,7 +30,7 @@ namespace Core.Repositories
         {
             return _context.Cotacoes.Any(c => c.DataRegistro == data.Date);
         }
-        public List<string> ObterTicketsCestaAtual()
+        public List<string> ObterTickersCestaAtual()
         {
             return _context.Cestas
                             .OrderByDescending(c => c.DataCriacao)

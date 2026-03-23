@@ -6,6 +6,6 @@ namespace Core.Interfaces.Cotacoes
     {
         void PopularTabela(List<Cotacao> cotacoes);
         bool ExisteRegistroParaData(DateTime data);
-        List<string> ObterTicketsCestaAtual();
+        List<string> ObterTickersCestaAtual();
     }
 }

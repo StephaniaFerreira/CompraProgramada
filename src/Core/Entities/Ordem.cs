@@ -32,18 +32,6 @@ namespace Core.Entities
         public virtual Ordem Ordem { get; set; } = null!;
     }
 
-    public class ResiduoMaster
-    {
-        [Key]
-        public int Id { get; set; }
-        public string Ticker { get; set; } = null!;
-        public int Quantidade { get; set; }
-
-        public int? OrdemId { get; set; }
-        [ForeignKey("OrdemId")]
-        public virtual Ordem? OrdemOrigem { get; set; }
-    }
-
     public class DistribuicaoCliente
     {
         [Key]

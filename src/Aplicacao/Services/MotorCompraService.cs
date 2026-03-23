@@ -1,7 +1,4 @@
-﻿using BrazilHolidays.Net;
-using Microsoft.EntityFrameworkCore;
-using Core.Interfaces;
-using Core.Entities;
+﻿using Core.Entities;
 using Aplicacao.Interfaces;
 using Core.Interfaces.MotorCompra;
 using Aplicacao.Validacoes;
@@ -10,133 +7,96 @@ namespace Core.MotorCompra
 {
     public class MotorCompraService : IMotorCompraService
     {
-        private readonly IDbContext _context;
         private readonly IImpostoService _impostoService;
         private readonly IMotorCompraDomainService _motorCompraDomainService;
         private readonly IMotorCompraRepository _motorCompraCompraRepository;
 
-        public MotorCompraService(IDbContext context, IMotorCompraDomainService motorCompraDomainService, IMotorCompraRepository motorCompraCompraRepository, IImpostoService impostoService)
+        public MotorCompraService(IMotorCompraDomainService motorCompraDomainService, IMotorCompraRepository motorCompraCompraRepository, IImpostoService impostoService)
         {
-            _context = context;
             _impostoService = impostoService;
             _motorCompraDomainService = motorCompraDomainService;
             _motorCompraCompraRepository = motorCompraCompraRepository;
         }
-        public void ExecutarMotorDeCompra(DateTime data)
+        public int ExecutarMotorDeCompra(DateTime data)
         {
-            if (!EhDataDeExecucaoValida(data))
-            {
-                throw new InvalidOperationException($"A data {data:dd/MM/yyyy} não é um dia de execução válido (5, 15 ou 25).");
-            }
-
+            ValidacaoCompra.EhDataDeExecucaoValida(data);
 
             var clientes = _motorCompraCompraRepository.ObterClientesAtivos();
-            decimal valorAporteTotal = clientes.Sum(c => c.ValorMensal / 3);
+            decimal valorAporteTotalMaster = clientes.Sum(c => c.ValorMensal / 3);
 
             var cestaVigente = _motorCompraCompraRepository.ObterCestaVigente();
 
-            Dictionary<string, decimal> cotacoes = _motorCompraCompraRepository.ObterCotacaoPorTicket(cestaVigente.Itens, data);
+            Dictionary<string, decimal> cotacoes = _motorCompraCompraRepository.ObterCotacaoPorTicker(cestaVigente.Itens, data);
 
             ValidacaoCompra.ExisteCotacao(cotacoes);
 
             var contaMaster = _motorCompraCompraRepository.ObterContaMaster();
 
 
-            Dictionary<string, int> quantidadeAcaoAComprarPorTicket = new();
+            Dictionary<string, int> quantidadeAcaoAComprarPorTicker = new();
 
-            foreach (var ticket in cestaVigente!.Itens)
+            foreach (var Ticker in cestaVigente!.Itens)
             {
                
-                var valorTotalAtivo =_motorCompraDomainService.CalcularValorTotalAtivo(ticket, valorAporteTotal);
+                var valorTotalAtivo =_motorCompraDomainService.CalcularValorTotalAtivo(Ticker, valorAporteTotalMaster);
                 
-                var quantidadeAtivo = _motorCompraDomainService.CalcularQuantidadeAtivo(valorTotalAtivo, cotacoes, ticket);
+                var quantidadeAtivo = _motorCompraDomainService.CalcularQuantidadeAtivo(valorTotalAtivo, cotacoes, Ticker);
 
-                var quantidadeRemanecente = _motorCompraCompraRepository.ObterQuantidadeRemanecenteCustodia(contaMaster, ticket);
+                var quantidadeRemanecente = _motorCompraCompraRepository.ObterQuantidadeRemanecenteCustodia(contaMaster, Ticker);
 
-                quantidadeAcaoAComprarPorTicket[ticket.Ticker] = _motorCompraDomainService.CalcularQuantidadeAtivoAComprar(quantidadeAtivo, quantidadeRemanecente);
+                quantidadeAcaoAComprarPorTicker[Ticker.Ticker] = _motorCompraDomainService.CalcularQuantidadeAtivoAComprar(quantidadeAtivo, quantidadeRemanecente);
                                               
-                int quantidadeLotesPadrao = _motorCompraDomainService.CalcularQuantidadeLotesPadrao(quantidadeAcaoAComprarPorTicket, ticket);
+                int quantidadeLotesPadrao = _motorCompraDomainService.CalcularQuantidadeLotesPadrao(quantidadeAcaoAComprarPorTicker, Ticker);
                 
-                int quantidadeFracionaria = _motorCompraDomainService.CalcularQuantidadeLotesFracionario(quantidadeAcaoAComprarPorTicket, ticket);
+                int quantidadeFracionaria = _motorCompraDomainService.CalcularQuantidadeLotesFracionario(quantidadeAcaoAComprarPorTicker, Ticker);
 
-                var ordens = _motorCompraDomainService.CriarOrdemCompraMaster(quantidadeLotesPadrao, quantidadeFracionaria, cotacoes, ticket);
+                var ordens = _motorCompraDomainService.CriarOrdemCompraMaster(quantidadeLotesPadrao, quantidadeFracionaria, cotacoes, Ticker, data);
 
                 _motorCompraCompraRepository.AdicionarOrdensMaster(ordens);
 
-                var custodiasMaster = _motorCompraDomainService.CriarCustodiaMaster(ordens, contaMaster);
-
-                _motorCompraCompraRepository.AdicionarCustodiaMaster(custodiasMaster);
-
                 CustodiaFilhote contaCustodiaFilhote = new();
                 int totalDistribuido = 0;
+                var novoPrecoMedio = 0m;
 
                 foreach (var cliente in clientes)
                 {
                     var valorAporteIndividual = _motorCompraDomainService.CalcularValorAporteIndividual(cliente);
-                    var porcentagemAporteCliente = _motorCompraDomainService.CalcularPorcentagemAporteIndividual(valorAporteIndividual, valorAporteTotal);
+                    var porcentagemAporteCliente = _motorCompraDomainService.CalcularPorcentagemAporteIndividual(valorAporteIndividual, valorAporteTotalMaster);
 
-                    int quantidadeNova = _motorCompraDomainService.CalcularQuantidadeNovaAtivo(quantidadeAcaoAComprarPorTicket, ticket, porcentagemAporteCliente);
+                    int quantidadeNova = _motorCompraDomainService.CalcularQuantidadeNovaAtivo(quantidadeAcaoAComprarPorTicker, Ticker, porcentagemAporteCliente);
                     totalDistribuido += quantidadeNova;
 
-                    var custodiaAnterior = _motorCompraCompraRepository.ObterCustodiaFilhote(ticket, cliente);
+                    var custodiaAnterior = _motorCompraCompraRepository.ObterCustodiaFilhote(Ticker, cliente);
 
-                    var novoPrecoMedio = _motorCompraDomainService.CalcularNovoPrecoMedio(custodiaAnterior, quantidadeNova, cotacoes, ticket);
+                    novoPrecoMedio = _motorCompraDomainService.CalcularNovoPrecoMedio(custodiaAnterior, quantidadeNova, cotacoes, Ticker);
 
-                    var contaGraficaId = _motorCompraCompraRepository.ObterContaGraficaId(ticket, cliente);
+                    var contaGraficaId = _motorCompraCompraRepository.ObterContaGraficaId(Ticker, cliente);
 
-                    var custodia = _motorCompraDomainService.CriarOuAlterarCustodiaFilhote(custodiaAnterior, contaGraficaId, ticket, quantidadeNova, novoPrecoMedio, cotacoes);
+                    var custodia = _motorCompraDomainService.CriarOuAlterarCustodiaFilhote(custodiaAnterior, contaGraficaId, Ticker, quantidadeNova, novoPrecoMedio, cotacoes, data);
 
                     _motorCompraCompraRepository.AdicionarCustodiaFilhote(custodia);
 
                 }
 
-                //var residuoAnterior = _motorCompraCompraRepository.ObterResiduoMaster(contaMaster, ticket);
+                var residuoAnterior = _motorCompraCompraRepository.ObterResiduoMaster(contaMaster, Ticker);
 
-                //var residuo = _motorCompraDomainService.AlterarResiduos(totalDistribuido, ticket, quantidadeAtivo, contaMaster, data, residuoAnterior!);
+                var quantidadeResiduoAtual = _motorCompraDomainService.CalcularQuantidadeResiduo(quantidadeAcaoAComprarPorTicker[Ticker.Ticker], totalDistribuido);
 
-                //_motorCompraCompraRepository.AdicionarResiduos(residuo);
+                if (quantidadeResiduoAtual != 0)
+                {
+                    var residuo = _motorCompraDomainService.CriarOuAlterarResiduos(Ticker, quantidadeResiduoAtual, contaMaster, data, residuoAnterior, novoPrecoMedio, cotacoes[Ticker.Ticker]);
+
+                    _motorCompraCompraRepository.AdicionarResiduos(residuo);
+                }
+                
             }
 
             _motorCompraCompraRepository.Salvar();
 
-            _impostoService.CalcularIRDedoDuro(data).GetAwaiter().GetResult();
+            return _impostoService.CalcularIRDedoDuro(data).GetAwaiter().GetResult();
 
         }
-        public DateTime ObterProximoDiaUtil(DateTime data)
-        {
-            while (EhFimDeSemana(data) || EhFeriado(data))
-            {
-                data = data.AddDays(1);
-            }
-            return data;
-        }
-        private static bool EhFimDeSemana(DateTime data)
-        {
-            return data.DayOfWeek == DayOfWeek.Saturday || data.DayOfWeek == DayOfWeek.Sunday;
-        }
-        private static bool EhFeriado(DateTime data)
-        {
-            return data.IsHoliday();
-        }
-
-        private bool EhDataDeExecucaoValida(DateTime data)
-        {
-            int[] diasAlvo = { 5, 15, 25 };
-
-            foreach (var dia in diasAlvo)
-            {
-                DateTime dataTeorica = new DateTime(data.Year, data.Month, dia);
-
-                DateTime dataExecucaoEsperada = ObterProximoDiaUtil(dataTeorica);
-
-                if (data.Date == dataExecucaoEsperada.Date)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
+        
 
     }
 }

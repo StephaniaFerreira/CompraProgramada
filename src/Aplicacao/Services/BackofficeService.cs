@@ -3,7 +3,6 @@ using Aplicacao.Models.Cesta;
 using Aplicacao.Validacoes;
 using Core.Entities;
 using Core.Interfaces.Backoffice;
-using Microsoft.EntityFrameworkCore;
 
 
 namespace Aplicacao.Services
@@ -104,7 +103,7 @@ namespace Aplicacao.Services
 
             ValidacaoCesta.ValidarCestaAtiva(cesta);
 
-            var cotacoesPorTicker = _backofficeRepository.ObterCotacaoPorTicket(cesta!.Itens!);
+            var cotacoesPorTicker = _backofficeRepository.ObterCotacaoPorTicker(cesta!.Itens!);
 
             var itensComCotacao = cesta!.Itens
                 .Select(i => new ItemAtualResponse(
@@ -167,10 +166,79 @@ namespace Aplicacao.Services
         public ExecucaoCompraResponse ExecutarCompraMotor(ExecucaoCompraRequest request)
         {
 
-            _motorCompra.ExecutarMotorDeCompra(request.DataReferencia);
-            
+            var quantidadeMsg = _motorCompra.ExecutarMotorDeCompra(request.DataReferencia);
 
-            return new ExecucaoCompraResponse();
+            var ordens = _backofficeRepository.ObterOrdens(request.DataReferencia);
+            var custodiasFilhotes = _backofficeRepository.ObterCustodiaFilhotes(request.DataReferencia);
+            var residuosCustMaster = _backofficeRepository.ObterCustodiaMaster();
+            var clientes = _backofficeRepository.ObterClientesAtivos();
+
+            var distribuicoes = new List<DistribuicaoClienteResponse>();
+
+            foreach (var cliente in clientes)
+            {
+                var custodiasCliente = custodiasFilhotes
+                    .Where(c => c.ContaGraficaId == cliente.ContaGrafica.Id)
+                    .ToList();
+
+                var ativosDistribuidos = custodiasCliente
+                    .Select(c => new AtivoDistribuidoResponse
+                    {
+                        Ticker = c.Ticker,
+                        Quantidade = c.Quantidade
+                    })
+                    .ToList();
+
+                var distribuicao = new DistribuicaoClienteResponse
+                {
+                    ClienteId = cliente.Id,
+                    Nome = cliente.Nome,
+                    ValorAporte = custodiasCliente.Sum(c => c.ValorAtual),
+                    Ativos = ativosDistribuidos
+                };
+
+                distribuicoes.Add(distribuicao);
+            }
+
+            var residuos = new List<ResiduoMasterResponse>();
+
+            foreach (var residuo in residuosCustMaster)
+            {
+                var r = new ResiduoMasterResponse
+                {
+                    Ticker = residuo.Ticker,
+                    Quantidade = residuo.Quantidade,
+                };
+
+                residuos.Add(r);
+            }
+
+            var ordensResponse = ordens.Select(o => new OrdemResponse
+            {
+                Ticker = o.Ticker,
+                QuantidadeTotal = o.QuantidadeTotal,
+                Detalhes = o.Detalhes.Select(d => new DetalheOrdemResponse
+                {
+                    Tipo = d.Tipo,
+                    Ticker = d.Ticker,
+                    Quantidade = d.Quantidade
+                }).ToList(),
+                ValorTotal = o.ValorTotal,
+                PrecoUnitario = o.PrecoUnitario
+            }).ToList();
+
+            var response = new ExecucaoCompraResponse {
+                    DataExecucao = request.DataReferencia,
+                    TotalClientes = clientes.Count,
+                    TotalConsolidado = ordens.Sum(o => o.ValorTotal),
+                    OrdensCompra = ordensResponse,
+                    Distribuicoes = distribuicoes,
+                    ResiduosCustMaster = residuos,
+                    EventosIRPublicados = quantidadeMsg,
+                    Mensagem = $"Compra programada executada com sucesso para {clientes.Count} clientes"
+            };
+
+                return response;
         }
     }
 }

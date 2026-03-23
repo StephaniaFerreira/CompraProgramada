@@ -2,7 +2,7 @@
 {
     public interface IImpostoService
     {
-        Task CalcularIRDedoDuro(DateTime dataReferencia);
+        Task<int> CalcularIRDedoDuro(DateTime dataReferencia);
         void CalcularIRsobreVendas(DateTime data);
     }
 }

@@ -23,7 +23,7 @@ namespace Aplicacao.Services
                                 .OrderByDescending(c => c.DataCriacao)
                                 .FirstOrDefault();
 
-            var ticketsDaCesta = cestaVigente!.Itens
+            var TickersDaCesta = cestaVigente!.Itens
                                  .Select(i => i.Ticker)
                                  .ToList();
 
@@ -37,7 +37,7 @@ namespace Aplicacao.Services
                 var custodiasFilhote = _context.CustodiasFilhotes.Where(c => c.ContaGraficaId == contaGrafica!.Id);
 
                 var ativosAVender = custodiasFilhote
-                                    .Where(c => !ticketsDaCesta.Contains(c.Ticker))
+                                    .Where(c => !TickersDaCesta.Contains(c.Ticker))
                                     .ToList();
 
                 int quantidadeAComprar = 0;
