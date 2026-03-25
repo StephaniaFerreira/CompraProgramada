@@ -194,7 +194,7 @@ Mesmo que neste momento o sistema esteja em um **monólito modular**, essa estru
                                +------------------------+
 
 +--------------------+           +--------------------+
-|    ContaMaster     | 1 : N     |    ItemCustodia    |
+|    ContaMaster     | 1 : N     |    CustodiaMaster  |
 +--------------------+-----------+--------------------+
 | Id (PK)            |           | Id (PK)            |
 | NumeroConta        |           | Ticker             |
@@ -206,7 +206,7 @@ Mesmo que neste momento o sistema esteja em um **monólito modular**, essa estru
                                  +--------------------+
 
 +--------------------+           +--------------------+
-|       Cesta        | 1 : N     |      ItemCesta     |
+|       Cesta        | 1 : N     |      ItensCesta    |
 +--------------------+-----------+--------------------+
 | Id (PK)            |           | Id (PK)            |
 | Nome               |           | Ticker             |
@@ -230,7 +230,7 @@ Mesmo que neste momento o sistema esteja em um **monólito modular**, essa estru
 +--------------------+
 
 +--------------------+           +--------------------+
-|    OrdemCompra     | 1 : N     |   DetalheOrdem     |
+|      Ordens        | 1 : N     |   DetalheOrdem     |
 +--------------------+-----------+--------------------+
 | Id (PK)            |           | Id (PK)            |
 | Ticker             |           | Tipo               |
@@ -238,21 +238,27 @@ Mesmo que neste momento o sistema esteja em um **monólito modular**, essa estru
 | PrecoUnitario      |           | Quantidade         |
 | ValorTotal         |           | OrdemCompraId (FK) |
 +--------------------+           +--------------------+
+```
 
-+--------------------+
-|  ResiduoMaster     |
-+--------------------+
-| Id (PK)            |
-| Ticker             |
-| Quantidade         |
-| OrdemCompraId (FK) |
-+--------------------+
+# Como rodar no linux
 
-+------------------------+          +------------------------+
-| DistribuicaoCliente    | 1 : N    |   AtivoDistribuido      |
-+------------------------+----------+------------------------+
-| Id (PK)                |          | Id (PK)                |
-| ClienteId              |          | Ticker                 |
-| Nome                   |          | Quantidade             |
-| ValorAporte            |          | DistribuicaoClienteId  |
-+------------------------+          +------------------------+
+```bash
+//Subir o docker
+sudo docker compose up -d
+
+//Rodar as APIs, abra um terminal em cada API
+dotnet run
+
+//Acessar Cliente
+https://localhost:7050/swagger
+
+//Acessar Backoffice
+https://localhost:7059/swagger
+
+//Acessar o banco pelo terminal
+sudo docker exec -it mysql-infra -u root -p
+
+//Acessar a interface do Kafka
+http://localhost:8080/
+
+
