@@ -32,25 +32,25 @@ namespace Core.Entities
         public virtual Ordem Ordem { get; set; } = null!;
     }
 
-    public class DistribuicaoCliente
-    {
-        [Key]
-        public int Id { get; set; } 
-        public int ClienteId { get; set; }
-        public string Nome { get; set; } = null!;
-        public DateTime DataCriacao { get; set; }
-        public decimal ValorAporte { get; set; }
-        public virtual List<AtivoDistribuido> Ativos { get; set; } = new List<AtivoDistribuido>();
-    }
+    //public class DistribuicaoCliente
+    //{
+    //    [Key]
+    //    public int Id { get; set; } 
+    //    public int ClienteId { get; set; }
+    //    public string Nome { get; set; } = null!;
+    //    public DateTime DataCriacao { get; set; }
+    //    public decimal ValorAporte { get; set; }
+    //    public virtual List<AtivoDistribuido> Ativos { get; set; } = new List<AtivoDistribuido>();
+    //}
 
-    public class AtivoDistribuido
-    {
-        [Key]
-        public int Id { get; set; }
-        public string Ticker { get; set; } = null!;
-        public int Quantidade { get; set; }
-        public int DistribuicaoClienteId { get; set; }
-        [ForeignKey("DistribuicaoClienteId")]
-        public virtual DistribuicaoCliente DistribuicaoCliente { get; set; } = null!;
-    }
+    //public class AtivoDistribuido
+    //{
+    //    [Key]
+    //    public int Id { get; set; }
+    //    public string Ticker { get; set; } = null!;
+    //    public int Quantidade { get; set; }
+    //    public int DistribuicaoClienteId { get; set; }
+    //    [ForeignKey("DistribuicaoClienteId")]
+    //    public virtual DistribuicaoCliente DistribuicaoCliente { get; set; } = null!;
+    //}
 }

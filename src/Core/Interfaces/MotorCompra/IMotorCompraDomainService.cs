@@ -1,9 +1,4 @@
 ﻿using Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Interfaces.MotorCompra
 {
@@ -18,7 +13,7 @@ namespace Core.Interfaces.MotorCompra
         int CalcularQuantidadeNovaAtivo(Dictionary<string, int> quantidadeAcaoAComprarPorTicker, ItemCesta Ticker, decimal porcentagemAporteCliente);
         decimal CalcularNovoPrecoMedio(CustodiaFilhote custodiaAnterior, int quantidadeNova, Dictionary<string, decimal> cotacoes, ItemCesta item);
         decimal CalcularPorcentagemAporteIndividual(decimal valorAporteIndividual, decimal valorAporteTotal);
-        CustodiaFilhote CriarOuAlterarCustodiaFilhote(CustodiaFilhote custodiaAnterior, int contaGraficaId, ItemCesta Ticker, int quantidadeNova, decimal novoPrecoMedio, Dictionary<string, decimal> cotacoes, DateTime data);
+        CustodiaFilhote CriarCustodiaFilhote(CustodiaFilhote? custodiaAnterior, int contaGraficaId, ItemCesta Ticker, int quantidadeNova, decimal novoPrecoMedio, Dictionary<string, decimal> cotacoes, DateTime data, decimal valorAporteIndividual);
         CustodiaMaster CriarOuAlterarResiduos(ItemCesta Ticker, int quantidadeAtivo, ContaMaster contaMaster, DateTime data, CustodiaMaster? residuoAnterior, decimal precoMedio, decimal valortual);
         List<Ordem> CriarOrdemCompraMaster(int quantidadeLotesPadrao, int quantidadeFracionaria, Dictionary<string, decimal> cotacoes, ItemCesta Ticker, DateTime data);
         List<CustodiaMaster> CriarCustodiaMaster(List<Ordem> ordens, ContaMaster contaMaster);

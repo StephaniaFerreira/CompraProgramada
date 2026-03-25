@@ -7,11 +7,11 @@
     decimal RentabilidadePercentual
 );
 
-    public record HistoricoAporte(
-        string Data,
-        decimal Valor,
-        string Parcela
-    );
+    public class HistoricoAporte {
+        public string Data { get; set; }
+        public decimal Valor { get; set; }
+        public string Parcela { get; set; } = null!;
+    }
 
     public record EvolucaoCarteira(
         string Data,

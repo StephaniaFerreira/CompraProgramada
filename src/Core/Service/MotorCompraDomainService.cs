@@ -1,8 +1,7 @@
-﻿using BrazilHolidays.Net;
-using Core.Entities;
+﻿using Core.Entities;
 using Core.Interfaces.MotorCompra;
 
-namespace Core.Repositories
+namespace Core.Service
 {
     public class MotorCompraDomainService : IMotorCompraDomainService
     {
@@ -102,31 +101,19 @@ namespace Core.Repositories
             decimal novoPrecoMedio = ((qtdAnterior * precoMedioAnterior) + (quantidadeNova * cotacoes[Ticker.Ticker])) / (qtdAnterior + quantidadeNova);
             return novoPrecoMedio;
         }
-        public CustodiaFilhote CriarOuAlterarCustodiaFilhote(CustodiaFilhote custodiaAnterior, int contaGraficaId, ItemCesta Ticker, int quantidadeNova, decimal novoPrecoMedio, Dictionary<string, decimal> cotacoes, DateTime data)
+        public CustodiaFilhote CriarCustodiaFilhote(CustodiaFilhote? custodiaAnterior, int contaGraficaId, ItemCesta Ticker, int quantidadeNova, decimal novoPrecoMedio, Dictionary<string, decimal> cotacoes, DateTime data, decimal valorAporteIndividual)
         {
-            var custodia = custodiaAnterior;
-
-            if (custodiaAnterior is not null)
-            {
-                custodiaAnterior.Quantidade += quantidadeNova;
-                custodiaAnterior.PrecoMedio = novoPrecoMedio;
-                custodiaAnterior.ValorAtual = cotacoes[Ticker.Ticker];
-                custodiaAnterior.DataUltimaAtualizacao = data.Date;
-            }
-            else
-            {
-                custodia = new CustodiaFilhote
-                {
-                    ContaGraficaId = contaGraficaId,
-                    Ticker = Ticker.Ticker,
-                    Quantidade = quantidadeNova,
-                    PrecoMedio = novoPrecoMedio,
-                    ValorAtual = cotacoes[Ticker.Ticker],
-                    DataUltimaAtualizacao = data.Date
-                };
-            }
-
-            return custodia;
+           
+               return new CustodiaFilhote
+               {
+                   ContaGraficaId = contaGraficaId,
+                   Ticker = Ticker.Ticker,
+                   Quantidade = custodiaAnterior is null ? quantidadeNova : custodiaAnterior.Quantidade + quantidadeNova,
+                   PrecoMedio = novoPrecoMedio,
+                   ValorAtual = cotacoes[Ticker.Ticker],
+                   DataUltimaAtualizacao = data.Date,
+                   ValorTotalAporteDia = valorAporteIndividual
+               };
         }
         public CustodiaMaster CriarOuAlterarResiduos(ItemCesta Ticker, int quantidadeResiduoAtual, ContaMaster contaMaster, DateTime data, CustodiaMaster? residuoAnterior, decimal precoMedio, decimal valorAtual)
         {

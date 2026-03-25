@@ -28,6 +28,7 @@ namespace Core.Entities
         public decimal ValorAtual { get; set; } 
 
         public DateTime DataUltimaAtualizacao { get; set; }
+        public decimal ValorTotalAporteDia { get; set; }
     }
 }
 

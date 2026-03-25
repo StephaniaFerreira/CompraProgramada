@@ -24,8 +24,6 @@ namespace Infraestrutura.Persistencia
 
         public DbSet<CustodiaFilhote> CustodiasFilhotes { get; set; } = null!;
         public DbSet<Cotacao> Cotacoes { get; set; } = null!;
-        public DbSet<ArquivoLido> ArquivosLidos { get; set; } = null!;
-        public DbSet<DistribuicaoCliente> DistribuicoesCliente { get; set; } = null!;
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

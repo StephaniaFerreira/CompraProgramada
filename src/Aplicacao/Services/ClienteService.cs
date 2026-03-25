@@ -82,8 +82,6 @@ namespace Aplicacao.Services
 
         public AlterarValorMensalResponse AlterarValorMensal(int clienteId, AlterarValorMensalRequest request)
         {
-            ValidacaoCliente.ValidarAlteracaoValor(request.NovoValorMensal);
-
             var cliente = _clienteRepository.ObterCliente(clienteId);
 
             ValidacaoCliente.ValidarExisteCliente(cliente);
@@ -157,9 +155,9 @@ namespace Aplicacao.Services
 
             ValidacaoCliente.ValidarExisteCliente(cliente);
 
-            var custodiasFilhotes = _clienteRepository.ObterCustodiasFilhotes(cliente!);
+            var custodiasFilhotes = _clienteRepository.ObterCustodiasFilhotesGroupData(cliente!);
 
-            var distribuicoes = _clienteRepository.ObterDistribuicoesCliente(cliente.Id);
+            ValidacaoCliente.ValidarCustodiasFilhotes(custodiasFilhotes);
 
             decimal valorTotalInvestido = _clienteDomainService.CalcularTotalInvestido(custodiasFilhotes!);
             decimal valorAtualCarteira = _clienteDomainService.CalcularValorAtualTotal(custodiasFilhotes!);
@@ -179,29 +177,32 @@ namespace Aplicacao.Services
 
             decimal valorInvestidoAcumulado = 0;
 
-            foreach (var d in distribuicoes)
+            foreach (var custodia in custodiasFilhotes)
             {
-                valorInvestidoAcumulado += d.ValorAporte;
+                valorInvestidoAcumulado += custodia!.PrecoMedio;
 
-                historicoAportes.Add(new HistoricoAporte(
-                    d.DataCriacao.ToString("yyyy-MM-dd"),
-                    d.ValorAporte,
-                    "1/1" 
-                ));
+                var histAporte = new HistoricoAporte();
+                histAporte.Data = custodia.DataUltimaAtualizacao.ToString("yyyy-MM-dd");
+                histAporte.Valor = 0m;
+                if (custodia.DataUltimaAtualizacao.Day == 5)
+                    histAporte.Parcela = "1/3";
+                else if(custodia.DataUltimaAtualizacao.Day == 15)
+                    histAporte.Parcela = "2/3";
+                else
+                    histAporte.Parcela = "3/3";
+
+
+                historicoAportes.Add(histAporte);
 
                 decimal valorMercadoNaData = 0;
 
-                foreach (var ativo in d.Ativos)
-                {
 
-                    var cotacaoHistorica = _clienteRepository.ObterCotacao(ativo, d.DataCriacao);
+                var cotacaoHistorica = _clienteRepository.ObterCotacao(custodia.Ticker, custodia.DataUltimaAtualizacao);
 
-
-                    valorMercadoNaData += ativo.Quantidade * cotacaoHistorica;
-                }
+                valorMercadoNaData += custodia.Quantidade * cotacaoHistorica;
 
                 evolucaoCarteira.Add(new EvolucaoCarteira(
-                                        d.DataCriacao.ToString("yyyy-MM-dd"),
+                                        custodia.DataUltimaAtualizacao.ToString("yyyy-MM-dd"),
                                         valorMercadoNaData,
                                         valorInvestidoAcumulado,
                                         valorInvestidoAcumulado > 0 ? ((valorMercadoNaData / valorInvestidoAcumulado) - 1) * 100 : 0

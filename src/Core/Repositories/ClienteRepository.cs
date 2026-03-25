@@ -31,25 +31,16 @@ namespace Core.Repositories
                 .FirstOrDefault(c => c.Id == ClienteId);
             return cliente;
         }
-        public List<DistribuicaoCliente> ObterDistribuicoesCliente(int clienteId)
-        {
-            var distribuicoes = _context.DistribuicoesCliente
-                            .Include(d => d.Ativos)
-                            .Where(d => d.ClienteId == clienteId)
-                            .OrderBy(d => d.DataCriacao)
-                            .ToList();
-            return distribuicoes;
-        }
-        public decimal ObterCotacao(AtivoDistribuido ativo, DateTime dataCriacao)
+        public decimal ObterCotacao(string ticker, DateTime dataCriacao)
         {
             var cotacaoHistorica = _context.Cotacoes
-                        .Where(c => c.Ticker == ativo.Ticker && c.DataPregao.Date == dataCriacao)
+                        .Where(c => c.Ticker == ticker && c.DataPregao.Date == dataCriacao)
                         .Select(c => c.PrecoFechamento)
                         .FirstOrDefault();
 
             if(cotacaoHistorica == 0)
                 cotacaoHistorica = _context.Cotacoes
-                            .Where(c => c.Ticker == ativo.Ticker && c.DataPregao.Date <= dataCriacao)
+                            .Where(c => c.Ticker == ticker && c.DataPregao.Date <= dataCriacao)
                             .OrderByDescending(c => c.DataPregao)
                             .Select(c => c.PrecoFechamento)
                             .FirstOrDefault();
@@ -64,6 +55,16 @@ namespace Core.Repositories
                 .ToList();
 
             return custodias!;
+        }
+        public List<CustodiaFilhote> ObterCustodiasFilhotesGroupData(ClienteCadastro cliente)
+        {
+            var aportesPorDia = _context.CustodiasFilhotes
+                .Where(c => c.ContaGraficaId == cliente!.ContaGrafica.Id)
+                .GroupBy(c => c.DataUltimaAtualizacao.Date)
+                .Select(g => g.First())
+                .ToList();
+
+            return aportesPorDia;
         }
         public void AdicionarContaGrafica(ContaGrafica conta)
         {

@@ -14,22 +14,6 @@ namespace Infraestrutura.Persistencia.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "ArquivosLidos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    NomeArquivo = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DataLeitura = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ArquivosLidos", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "Cestas",
                 columns: table => new
                 {
@@ -108,24 +92,6 @@ namespace Infraestrutura.Persistencia.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cotacoes", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "DistribuicoesCliente",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ClienteId = table.Column<int>(type: "int", nullable: false),
-                    Nome = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DataCriacao = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ValorAporte = table.Column<decimal>(type: "decimal(65,30)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DistribuicoesCliente", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -227,29 +193,6 @@ namespace Infraestrutura.Persistencia.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "AtivoDistribuido",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Ticker = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Quantidade = table.Column<int>(type: "int", nullable: false),
-                    DistribuicaoClienteId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AtivoDistribuido", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AtivoDistribuido_DistribuicoesCliente_DistribuicaoClienteId",
-                        column: x => x.DistribuicaoClienteId,
-                        principalTable: "DistribuicoesCliente",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "DetalheOrdem",
                 columns: table => new
                 {
@@ -286,7 +229,8 @@ namespace Infraestrutura.Persistencia.Migrations
                     Quantidade = table.Column<int>(type: "int", nullable: false),
                     PrecoMedio = table.Column<decimal>(type: "decimal(18,4)", nullable: false),
                     ValorAtual = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    DataUltimaAtualizacao = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    DataUltimaAtualizacao = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    ValorTotalAporteDia = table.Column<decimal>(type: "decimal(65,30)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -299,11 +243,6 @@ namespace Infraestrutura.Persistencia.Migrations
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AtivoDistribuido_DistribuicaoClienteId",
-                table: "AtivoDistribuido",
-                column: "DistribuicaoClienteId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Clientes_Cpf",
@@ -341,12 +280,6 @@ namespace Infraestrutura.Persistencia.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ArquivosLidos");
-
-            migrationBuilder.DropTable(
-                name: "AtivoDistribuido");
-
-            migrationBuilder.DropTable(
                 name: "Cotacoes");
 
             migrationBuilder.DropTable(
@@ -360,9 +293,6 @@ namespace Infraestrutura.Persistencia.Migrations
 
             migrationBuilder.DropTable(
                 name: "ItensCesta");
-
-            migrationBuilder.DropTable(
-                name: "DistribuicoesCliente");
 
             migrationBuilder.DropTable(
                 name: "ContaMaster");

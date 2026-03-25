@@ -19,47 +19,6 @@ namespace Infraestrutura.Persistencia.Migrations
                 .HasAnnotation("ProductVersion", "6.0.36")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Core.Entities.ArquivoLido", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DataLeitura")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("NomeArquivo")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ArquivosLidos");
-                });
-
-            modelBuilder.Entity("Core.Entities.AtivoDistribuido", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("DistribuicaoClienteId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantidade")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Ticker")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DistribuicaoClienteId");
-
-                    b.ToTable("AtivoDistribuido");
-                });
-
             modelBuilder.Entity("Core.Entities.Cesta", b =>
                 {
                     b.Property<int>("Id")
@@ -233,6 +192,9 @@ namespace Infraestrutura.Persistencia.Migrations
                     b.Property<decimal>("ValorAtual")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<decimal>("ValorTotalAporteDia")
+                        .HasColumnType("decimal(65,30)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ContaGraficaId");
@@ -300,30 +262,6 @@ namespace Infraestrutura.Persistencia.Migrations
                     b.ToTable("DetalheOrdem");
                 });
 
-            modelBuilder.Entity("Core.Entities.DistribuicaoCliente", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("ClienteId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DataCriacao")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<decimal>("ValorAporte")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DistribuicoesCliente");
-                });
-
             modelBuilder.Entity("Core.Entities.ItemCesta", b =>
                 {
                     b.Property<int>("Id")
@@ -379,17 +317,6 @@ namespace Infraestrutura.Persistencia.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Ordens");
-                });
-
-            modelBuilder.Entity("Core.Entities.AtivoDistribuido", b =>
-                {
-                    b.HasOne("Core.Entities.DistribuicaoCliente", "DistribuicaoCliente")
-                        .WithMany("Ativos")
-                        .HasForeignKey("DistribuicaoClienteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("DistribuicaoCliente");
                 });
 
             modelBuilder.Entity("Core.Entities.ContaGrafica", b =>
@@ -461,11 +388,6 @@ namespace Infraestrutura.Persistencia.Migrations
             modelBuilder.Entity("Core.Entities.ContaMaster", b =>
                 {
                     b.Navigation("ItensCustodia");
-                });
-
-            modelBuilder.Entity("Core.Entities.DistribuicaoCliente", b =>
-                {
-                    b.Navigation("Ativos");
                 });
 
             modelBuilder.Entity("Core.Entities.Ordem", b =>

@@ -40,13 +40,12 @@ namespace Aplicacao.Validacoes
 
                 DateTime dataExecucaoEsperada = ObterProximoDiaUtil(dataTeorica);
 
-                if (data.Date != dataExecucaoEsperada.Date)
-                {
-                    throw new InvalidOperationException($"A data {data:dd/MM/yyyy} não é um dia de execução válido (5, 15 ou 25).");
-                }
-
-                break;
+                if (data.Date == dataExecucaoEsperada.Date)
+                    return;
             }
+
+            throw new InvalidOperationException(
+                $"A data {data:dd/MM/yyyy} não é um dia de execução válido (5, 15 ou 25 ou próximo dia útil).");
         }
     }
 }

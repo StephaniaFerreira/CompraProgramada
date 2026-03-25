@@ -72,7 +72,7 @@ namespace Core.MotorCompra
 
                     var contaGraficaId = _motorCompraCompraRepository.ObterContaGraficaId(Ticker, cliente);
 
-                    var custodia = _motorCompraDomainService.CriarOuAlterarCustodiaFilhote(custodiaAnterior, contaGraficaId, Ticker, quantidadeNova, novoPrecoMedio, cotacoes, data);
+                    var custodia = _motorCompraDomainService.CriarCustodiaFilhote(custodiaAnterior, contaGraficaId, Ticker, quantidadeNova, novoPrecoMedio, cotacoes, data, valorAporteIndividual);
 
                     _motorCompraCompraRepository.AdicionarCustodiaFilhote(custodia);
 

@@ -9,9 +9,9 @@ namespace Core.Interfaces.Cliente
         void AdicionarCliente(ClienteCadastro cliente);
         void AdicionarContaGrafica(ContaGrafica cliente);
         ClienteCadastro ObterCliente(int clienteId);
-        List<DistribuicaoCliente> ObterDistribuicoesCliente(int clienteId);
         List<CustodiaFilhote?> ObterCustodiasFilhotes(ClienteCadastro cliente);
-        decimal ObterCotacao(AtivoDistribuido ativo, DateTime dataCriacao);
+        List<CustodiaFilhote?> ObterCustodiasFilhotesGroupData(ClienteCadastro cliente);
+        decimal ObterCotacao(string ativo, DateTime dataCriacao);
 
 
 

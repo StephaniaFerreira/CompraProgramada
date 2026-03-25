@@ -14,8 +14,6 @@ namespace Core.Interfaces
         DbSet<Ordem> Ordens { get; set; }
         DbSet<CustodiaFilhote> CustodiasFilhotes { get; set; }
         DbSet<Cotacao> Cotacoes { get; set; }
-        DbSet<ArquivoLido> ArquivosLidos { get; set; }
-        DbSet<DistribuicaoCliente> DistribuicoesCliente { get; set; }
 
         int SaveChanges();
     }
